@@ -9,6 +9,20 @@ import shutil
 import time
 import chardet
 import io
+
+# ChromaDB configuration for Streamlit Cloud
+os.makedirs("chroma_db", exist_ok=True)
+os.environ["CHROMADB_IMPLEMENTATION"] = "duckdb"
+
+from chromadb.config import Settings
+import chromadb
+
+# Initialize ChromaDB client
+try:
+    chroma_client = chromadb.Client(Settings(persist_directory="chroma_db"))
+except Exception as e:
+    st.error(f"ChromaDB initialization error: {e}")
+
 from crewai import Crew, Task, Agent
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.lib.pagesizes import letter
