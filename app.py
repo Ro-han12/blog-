@@ -1283,12 +1283,12 @@ def main():
         st.session_state.content_analysis = None
         st.session_state.plagiarism_score = None
         st.session_state.current_outputs = None
-        st.experimental_rerun()
+        st.rerun()
     
     # Reset button in sidebar
     if st.sidebar.button("Reset App"):
         st.session_state.clear()
-        st.experimental_rerun()
+        st.rerun()
 
     # Display selected page
     if page == "AI Blog Writer":
