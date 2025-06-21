@@ -35,7 +35,7 @@ except Exception as e:
     st.error(f"ChromaDB initialization error: {e}")
 
 from crewai import Crew, Task, Agent
-from PyPDF2 import PdfWriter, PdfReader
+from pypdf import PdfWriter, PdfReader
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
