@@ -59,11 +59,20 @@ if GOOGLE_API_KEY:
 # App version
 APP_VERSION = "1.0.0"
 
+# Available models
+AVAILABLE_MODELS = [
+    "gemini-2.0-flash",
+    "gemini-1.5-flash", 
+    "gemini-2.5-pro",
+    "gemini-2.5-flash",
+    "gemini-1.5-pro"
+]
+
 # Inline BlogAgents class
 class BlogAgents:
-    def __init__(self):
+    def __init__(self, model_name="gemini-2.0-flash"):
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+            model=model_name,
             google_api_key=os.getenv('GOOGLE_API_KEY'),
             temperature=0.7
         )
@@ -188,7 +197,7 @@ class BlogAgents:
 
 # Inline ResearchConverter class
 class ResearchConverter:
-    def __init__(self, gemini_api_key=None, output_dir="exports"):
+    def __init__(self, gemini_api_key=None, output_dir="exports", model_name="gemini-2.0-flash"):
         """Initialize the research converter with API keys and configuration."""
         self.gemini_api_key = gemini_api_key or os.getenv("GOOGLE_API_KEY")
         if not self.gemini_api_key:
@@ -199,7 +208,7 @@ class ResearchConverter:
         
         # Initialize the LLM
         self.llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash",
+            model=model_name,
             google_api_key=self.gemini_api_key,
             temperature=0.7
         )
@@ -572,8 +581,8 @@ def blog_writer_page():
     if st.button("Generate Blog"):
         if topic:
             with st.spinner("Generating your blog post..."):
-                # Initialize agents
-                blog_agents = BlogAgents()
+                # Initialize agents with selected model
+                blog_agents = BlogAgents(model_name=st.session_state.selected_model)
                 research_agent = blog_agents.create_research_agent()
                 nlp_agent = blog_agents.create_nlp_agent()
                 writer_agent = blog_agents.create_writer_agent()
@@ -720,7 +729,7 @@ def blog_writer_page():
                 if st.button("Check Plagiarism"):
                     with st.spinner("Checking for plagiarism..."):
                         # Initialize plagiarism checker agent
-                        blog_agents = BlogAgents()
+                        blog_agents = BlogAgents(model_name=st.session_state.selected_model)
                         plagiarism_agent = blog_agents.create_plagiarism_checker_agent()
                         
                         # Create plagiarism check task
@@ -1039,7 +1048,9 @@ def research_converter_page():
                     # Translate if requested
                     if translate:
                         with st.spinner("Translating text..."):
-                            translated_text = translate_to_english(processed_text, model)
+                            # Create a temporary model instance for translation
+                            temp_model = genai.GenerativeModel(st.session_state.selected_model)
+                            translated_text = translate_to_english(processed_text, temp_model)
                             st.session_state.translated_text = translated_text
                             # Create search tool with translated text
                             st.session_state.search_tool = create_search_tool(translated_text)
@@ -1096,9 +1107,10 @@ def research_converter_page():
 
                     if st.button("Process PDF"):
                         try:
-                            # Initialize ResearchConverter
+                            # Initialize ResearchConverter with selected model
                             converter = ResearchConverter(gemini_api_key=GOOGLE_API_KEY, 
-                                                       output_dir=temp_dir_path)
+                                                       output_dir=temp_dir_path,
+                                                       model_name=st.session_state.selected_model)
                             
                             # Use our custom search tool instead of the default one
                             researcher = ResearchAgents.create_researcher(converter.llm, st.session_state.search_tool)
@@ -1236,9 +1248,42 @@ def main():
     if not check_dependencies():
         return
 
+    # Initialize session state for model selection
+    if 'selected_model' not in st.session_state:
+        st.session_state.selected_model = "gemini-2.0-flash"
+
     # Sidebar navigation
     st.sidebar.title("Navigation")
     page = st.sidebar.radio("Choose a tool:", ["AI Blog Writer", "Research PDF Converter"])
+    
+    # Model selection in sidebar
+    st.sidebar.subheader("Model Settings")
+    selected_model = st.sidebar.selectbox(
+        "Choose AI Model:",
+        AVAILABLE_MODELS,
+        index=AVAILABLE_MODELS.index(st.session_state.selected_model),
+        help="Select the Gemini model to use for content generation. Different models may have varying capabilities and response times."
+    )
+    
+    # Model information
+    model_info = {
+        "gemini-2.0-flash": "Fast, efficient model for quick responses",
+        "gemini-1.5-flash": "Balanced performance and speed",
+        "gemini-2.5-pro": "Most capable model, best for complex tasks",
+        "gemini-2.5-flash": "Fast version of 2.5, good balance",
+        "gemini-1.5-pro": "Pro version with enhanced capabilities"
+    }
+    
+    st.sidebar.info(f"**Current Model:** {selected_model}\n\n{model_info.get(selected_model, 'Model information not available')}")
+    
+    # Update session state if model changed
+    if selected_model != st.session_state.selected_model:
+        st.session_state.selected_model = selected_model
+        st.session_state.blog_content = None
+        st.session_state.content_analysis = None
+        st.session_state.plagiarism_score = None
+        st.session_state.current_outputs = None
+        st.experimental_rerun()
     
     # Reset button in sidebar
     if st.sidebar.button("Reset App"):
