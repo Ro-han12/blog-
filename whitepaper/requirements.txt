@@ -1,0 +1,17 @@
+crewai>=0.28.0
+crewai-tools>=0.1.6
+langchain>=0.0.335
+langchain-google-genai>=0.0.5
+python-dotenv>=1.0.0
+fpdf==1.7.2
+markdown>=3.5.1
+argparse>=1.4.0
+pathlib>=1.0.1 
+streamlit==1.32.0
+pypdf>=3.0.0
+google-generativeai>=0.3.0
+pydantic>=2.0.0
+langchain-community>=0.0.10
+chardet==5.2.0
+PyPDF2==3.0.1
+pycryptodome==3.23.0

@@ -1,0 +1,36 @@
+# CrewAI and Tools
+crewai==0.28.2
+crewai-tools==0.1.6
+
+# LangChain ecosystem
+langchain==0.1.20
+langchain-core==0.1.53
+langchain-community==0.0.38
+langchain-google-genai==0.0.5
+
+# Google Generative AI
+google-generativeai==0.3.2
+
+# PDF Handling
+pypdf==3.11.0               # ✅ Bumped from 3.9.1 → required by embedchain
+fpdf==1.7.2
+
+# Streamlit and Markdown
+streamlit==1.32.0
+markdown>=3.5.1
+
+# NLP & Parsing
+nltk==3.8.1
+beautifulsoup4==4.12.3      # ✅ Required by crewai-tools
+chardet==5.2.0
+
+# Utilities
+python-dotenv==1.0.0        # ✅ Required by crewai
+requests==2.31.0            # ✅ Required by crewai-tools & langchain
+typing-extensions==4.14.0
+pydantic==2.11.5
+pycryptodome==3.23.0
+
+# Dependencies for chromadb compatibility
+numpy==1.24.3              # Pinned to version before NumPy 2.0
+chromadb==0.4.22          # Latest version known to work with numpy<2.0
