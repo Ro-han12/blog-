@@ -1,3 +1,11 @@
+# Fix sqlite3 version issue (required for chromadb)
+try:
+    import pysqlite3
+    import sys
+    sys.modules["sqlite3"] = pysqlite3
+except ImportError:
+    pass
+
 import streamlit as st
 import os
 import tempfile
@@ -14,22 +22,17 @@ import io
 os.makedirs("chroma_db", exist_ok=True)
 os.environ["CHROMADB_IMPLEMENTATION"] = "duckdb"
 
-from chromadb.config import Settings
-import chromadb
+def get_chroma_client():
+    """Initialize and return ChromaDB client with proper settings."""
+    from chromadb import Client
+    from chromadb.config import Settings
+    return Client(Settings(persist_directory="chroma_db"))
 
 # Initialize ChromaDB client
 try:
-    chroma_client = chromadb.Client(Settings(persist_directory="chroma_db"))
+    chroma_client = get_chroma_client()
 except Exception as e:
     st.error(f"ChromaDB initialization error: {e}")
-
-# SQLite3 patch for Streamlit Cloud compatibility
-try:
-    import pysqlite3
-    import sys
-    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
-except ImportError:
-    pass
 
 from crewai import Crew, Task, Agent
 from PyPDF2 import PdfWriter, PdfReader
