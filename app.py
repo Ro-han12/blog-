@@ -23,6 +23,14 @@ try:
 except Exception as e:
     st.error(f"ChromaDB initialization error: {e}")
 
+# SQLite3 patch for Streamlit Cloud compatibility
+try:
+    import pysqlite3
+    import sys
+    sys.modules["sqlite3"] = sys.modules.pop("pysqlite3")
+except ImportError:
+    pass
+
 from crewai import Crew, Task, Agent
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.lib.pagesizes import letter

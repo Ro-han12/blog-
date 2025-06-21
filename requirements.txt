@@ -34,3 +34,4 @@ pycryptodome==3.23.0
 # Dependencies for chromadb compatibility
 numpy==1.24.3              # Pinned to version before NumPy 2.0
 chromadb==0.4.22          # Latest version known to work with numpy<2.0
+pysqlite3-binary==0.5.1   # SQLite3 compatibility for Streamlit Cloud
